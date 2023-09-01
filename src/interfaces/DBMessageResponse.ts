@@ -1,4 +1,8 @@
-export default interface MessageResponse {
+import {Animal} from './Animal';
+import {Category} from './Category';
+import {Species} from './Species';
+
+export default interface DBMessageResponse {
   message: string;
-  result: object;
+  data: Category | Category[] | Animal | Animal[] | Species | Species[];
 }

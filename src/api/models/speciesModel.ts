@@ -8,6 +8,7 @@ const speciesSchema = new Schema<Species>({
     type: String,
     required: true,
     unique: true,
+    minlength: 2,
   },
   category: {
     type: Schema.Types.ObjectId,

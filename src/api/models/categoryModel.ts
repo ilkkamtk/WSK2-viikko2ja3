@@ -8,6 +8,7 @@ const categorySchema = new Schema<Category>({
     type: String,
     required: true,
     unique: true,
+    minlength: 2,
   },
 });
 
