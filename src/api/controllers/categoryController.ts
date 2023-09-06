@@ -63,6 +63,17 @@ const categoryPost = async (
   next: NextFunction
 ) => {
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const messages = errors
+        .array()
+        .map((error) => `${error.msg}: ${error.param}`)
+        .join(', ');
+      next(new CustomError(messages, 400));
+      return;
+    }
+
     const category = await CategoryModel.create(req.body);
     const output: DBMessageResponse = {
       message: 'Category created',
@@ -70,7 +81,7 @@ const categoryPost = async (
     };
     res.status(201).json(output);
   } catch (error) {
-    next(error);
+    next(new CustomError('Something went wrong with the server', 500));
   }
 };
 
