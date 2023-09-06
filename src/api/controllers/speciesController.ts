@@ -1,9 +1,10 @@
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
-import {Species} from '../../interfaces/Species';
+import {Species, SpeciesInput} from '../../interfaces/Species';
 import SpeciesModel from '../models/speciesModel';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
 import {validationResult} from 'express-validator';
+import imageFromWikipedia from '../../functions/imageFromWikipedia';
 
 const speciesListGet = async (
   req: Request,
@@ -65,8 +66,13 @@ const speciesPost = async (
       next(new CustomError(messages, 400));
       return;
     }
+    const image = await imageFromWikipedia(req.body.species_name);
+    const speciesWithImage: SpeciesInput = {
+      ...req.body,
+      image,
+    };
 
-    const species = new SpeciesModel(req.body);
+    const species = new SpeciesModel(speciesWithImage);
     const result = await species.save();
     const response: DBMessageResponse = {
       message: 'Species added',

@@ -18,7 +18,6 @@ router
   .post(
     body('species_name').notEmpty().isString().escape(),
     body('category').isMongoId(),
-    body('image').notEmpty().isString().escape(),
     body('location').notEmpty().isObject(),
     speciesPost
   );
