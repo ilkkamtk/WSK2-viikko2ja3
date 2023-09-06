@@ -2,9 +2,9 @@
   "name": "express-api-starter-ts",
   "version": "1.2.0",
   "description": " A basic starter for an express.js API with Typescript. Ilkka added gts",
-  "main": "src/index.ts",
+  "main": "dist/src/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node dist/src/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "lint": "eslint --fix src test",
