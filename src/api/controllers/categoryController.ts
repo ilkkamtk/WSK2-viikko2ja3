@@ -18,7 +18,7 @@ const categoryListGet = async (
   next: NextFunction
 ) => {
   try {
-    const categories = await CategoryModel.find();
+    const categories = await CategoryModel.find().select('-__v');
     if (!categories || categories.length === 0) {
       next(new CustomError('No categories found', 404));
       return;
@@ -46,7 +46,7 @@ const categoryGet = async (
       return;
     }
 
-    const category = await CategoryModel.findById(req.params.id);
+    const category = await CategoryModel.findById(req.params.id).select('-__v');
     if (!category) {
       next(new CustomError('Category not found', 404));
       return;
@@ -85,4 +85,83 @@ const categoryPost = async (
   }
 };
 
-export {categoryListGet, categoryGet, categoryPost};
+const categoryPut = async (
+  req: Request<{id: string}, {}, Category>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const messages = errors
+        .array()
+        .map((error) => `${error.msg}: ${error.param}`)
+        .join(', ');
+      next(new CustomError(messages, 400));
+      return;
+    }
+
+    const category = await CategoryModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    ).select('-__v');
+    if (!category) {
+      next(new CustomError('Category not found', 404));
+      return;
+    }
+    const output: DBMessageResponse = {
+      message: 'Category updated',
+      data: category,
+    };
+    res.json(output);
+  } catch (error) {
+    next(new CustomError('Something went wrong with the server', 500));
+  }
+};
+
+const categoryDelete = async (
+  req: Request<{id: string}, {}, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const messages = errors
+
+        .array()
+        .map((error) => `${error.msg}: ${error.param}`)
+        .join(', ');
+      next(new CustomError(messages, 400));
+      return;
+    }
+
+    const category = await CategoryModel.findByIdAndDelete(
+      req.params.id
+    ).select('-__v');
+    if (!category) {
+      next(new CustomError('Category not found', 404));
+      return;
+    }
+    const output: DBMessageResponse = {
+      message: 'Category deleted',
+      data: category,
+    };
+    res.json(output);
+  } catch (error) {
+    next(new CustomError('Something went wrong with the server', 500));
+  }
+};
+
+export {
+  categoryListGet,
+  categoryGet,
+  categoryPost,
+  categoryPut,
+  categoryDelete,
+};
