@@ -27,10 +27,10 @@ router
   .get(param('id').isMongoId(), animalGet)
   .put(
     param('id').isMongoId(),
-    body('animal_name').notEmpty().isString().escape(),
-    body('birthdate').isDate(),
-    body('species').isMongoId(),
-    body('gender').notEmpty().isString().escape(),
+    body('animal_name').isString().escape().optional(),
+    body('birthdate').isDate().optional(),
+    body('species').isMongoId().optional(),
+    body('gender').isString().escape().optional(),
     animalPut
   )
   .delete(param('id').isMongoId(), animalDelete);
