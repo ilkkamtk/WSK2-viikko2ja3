@@ -10,6 +10,7 @@ import CustomError from '../../classes/CustomError';
 import {Category} from '../../interfaces/Category';
 import CategoryModel from '../models/categoryModel';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
+import {validationResult} from 'express-validator';
 
 const categoryListGet = async (
   req: Request,
@@ -18,9 +19,13 @@ const categoryListGet = async (
 ) => {
   try {
     const categories = await CategoryModel.find();
+    if (!categories || categories.length === 0) {
+      next(new CustomError('No categories found', 404));
+      return;
+    }
     res.json(categories);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(new CustomError('Something went wrong with the server', 500));
   }
 };
 
@@ -30,14 +35,43 @@ const categoryGet = async (
   next: NextFunction
 ) => {
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const messages = errors
+        .array()
+        .map((error) => `${error.msg}: ${error.param}`)
+        .join(', ');
+      next(new CustomError(messages, 400));
+      return;
+    }
+
     const category = await CategoryModel.findById(req.params.id);
     if (!category) {
-      throw new CustomError('Category not found', 404);
+      next(new CustomError('Category not found', 404));
+      return;
     }
     res.json(category);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(new CustomError('Something went wrong with the server', 500));
   }
 };
 
-export {categoryListGet, categoryGet};
+const categoryPost = async (
+  req: Request<{}, {}, Category>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const category = await CategoryModel.create(req.body);
+    const output: DBMessageResponse = {
+      message: 'Category created',
+      data: category,
+    };
+    res.status(201).json(output);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {categoryListGet, categoryGet, categoryPost};
