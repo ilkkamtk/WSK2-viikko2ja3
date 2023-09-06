@@ -16,9 +16,9 @@ router
   .route('/')
   .get(speciesListGet)
   .post(
-    body('species_name').notEmpty().isString().escape(),
-    body('category').isMongoId(),
-    body('location').notEmpty().isObject(),
+    body('species_name').optional().isString().escape(),
+    body('category').isMongoId().optional(),
+    body('location').optional().isObject(),
     speciesPost
   );
 

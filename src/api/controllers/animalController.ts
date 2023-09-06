@@ -67,7 +67,11 @@ const animalPost = async (
     }
 
     const animal = await AnimalModel.create(req.body);
-    res.status(201).json(animal);
+    const message: DBMessageResponse = {
+      message: 'Animal created',
+      data: animal,
+    };
+    res.status(201).json(message);
   } catch (error) {
     next(new CustomError('Something went wrong with the server', 500));
   }
@@ -99,7 +103,11 @@ const animalPut = async (
       next(new CustomError('Animal not found', 404));
       return;
     }
-    res.json(animal);
+    const message: DBMessageResponse = {
+      message: 'Animal updated',
+      data: animal,
+    };
+    res.json(message);
   } catch (error) {
     next(new CustomError('Something went wrong with the server', 500));
   }
@@ -127,7 +135,12 @@ const animalDelete = async (
       next(new CustomError('Animal not found', 404));
       return;
     }
-    res.json(animal);
+
+    const message: DBMessageResponse = {
+      message: 'Animal deleted',
+      data: animal,
+    };
+    res.json(message);
   } catch (error) {
     next(new CustomError('Something went wrong with the server', 500));
   }
