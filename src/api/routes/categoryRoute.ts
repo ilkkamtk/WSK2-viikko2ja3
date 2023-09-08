@@ -9,6 +9,7 @@ import {
   // categoryPut,
 } from '../controllers/categoryController';
 import {param, body} from 'express-validator';
+import {authenticate} from '../../middlewares';
 
 const router = express.Router();
 
@@ -25,6 +26,6 @@ router
     body('category_name').notEmpty().isString().escape(),
     categoryPut
   )
-  .delete(param('id').isMongoId(), categoryDelete);
+  .delete(authenticate, param('id').isMongoId(), categoryDelete);
 
 export default router;

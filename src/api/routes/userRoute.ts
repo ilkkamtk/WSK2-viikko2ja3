@@ -7,9 +7,9 @@ const router = express.Router();
 router
   .route('/')
   .post(
-    body('username').escape(),
+    body('username').isLength({min: 2}).isString().escape(),
     body('email').isEmail().normalizeEmail(),
-    body('password').escape(),
+    body('password').isLength({min: 5}).isString().escape(),
     userPost
   );
 

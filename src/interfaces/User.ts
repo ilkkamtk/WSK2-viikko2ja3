@@ -13,4 +13,9 @@ interface UserLogin {
   id: string;
 }
 
-export {User, UserLogin};
+interface TokenUser {
+  id: string;
+  role: 'admin' | 'user';
+}
+
+export {User, UserLogin, TokenUser};
