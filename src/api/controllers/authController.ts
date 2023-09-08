@@ -1,10 +1,11 @@
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import {User} from '../../interfaces/User';
-import UserModel from '../models/userModel';
-import DBMessageResponse from '../../interfaces/DBMessageResponse';
 import {validationResult} from 'express-validator';
 import userModel from '../models/userModel';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import {LoginMessageResponse} from '../../interfaces/LoginMessageResponse';
 
 const loginPost = async (
   req: Request<{}, {}, User>,
@@ -28,6 +29,34 @@ const loginPost = async (
     const user = await userModel.findOne({username});
 
     if (!user) {
-      next(new CustomError('Incorrect username/password', 404));
+      next(new CustomError('Incorrect username/password', 403));
       return;
     }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      next(new CustomError('Incorrect username/password', 403));
+      return;
+    }
+
+    const token = jwt.sign(
+      {id: user._id, role: user.role},
+      process.env.JWT_SECRET as string
+    );
+
+    const message: LoginMessageResponse = {
+      message: 'Login successful',
+      user: {
+        username: user.username,
+        email: user.email,
+        id: user._id,
+      },
+      token: token,
+    };
+
+    res.json(message);
+  } catch (error) {
+    next(new CustomError('Login failed', 500));
+  }
+};
+
+export {loginPost};
