@@ -4,8 +4,6 @@ import {User} from '../../interfaces/User';
 import {validationResult} from 'express-validator';
 import userModel from '../models/userModel';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import {LoginMessageResponse} from '../../interfaces/LoginMessageResponse';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
 
 const userPost = async (
@@ -27,6 +25,7 @@ const userPost = async (
 
     const user = req.body;
     user.password = await bcrypt.hash(user.password, 12);
+    user.role = 'user';
 
     const newUser = await userModel.create(user);
     const response: DBMessageResponse = {
@@ -39,3 +38,9 @@ const userPost = async (
     };
 
     res.json(response);
+  } catch (error) {
+    next(new CustomError('User creation failed', 500));
+  }
+};
+
+export {userPost};
